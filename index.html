@@ -222,6 +222,30 @@
 
     @media (max-width: 500px) { .message { max-width: 90%; } }
 
+    #date-bar {
+      display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+      padding: 8px 16px; background: var(--surface2);
+      border-bottom: 1px solid var(--border);
+      position: relative; z-index: 10;
+      font-size: 0.78rem; color: var(--muted);
+      font-family: 'Space Mono', monospace;
+    }
+    #date-filter {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 8px; padding: 4px 8px; color: var(--text);
+      font-family: 'Space Mono', monospace; font-size: 0.75rem;
+      outline: none; cursor: pointer;
+    }
+    #date-filter:focus { border-color: var(--accent); }
+    #date-bar button {
+      background: transparent; border: 1px solid var(--border);
+      border-radius: 8px; padding: 4px 10px; color: var(--muted);
+      font-family: 'Space Mono', monospace; font-size: 0.72rem;
+      cursor: pointer; transition: all 0.2s;
+    }
+    #date-bar button:hover { border-color: var(--accent2); color: var(--accent2); }
+    #date-label { color: var(--accent); font-size: 0.72rem; }
+
     /* LOGIN */
     #login-screen {
       position: fixed; inset: 0; z-index: 999;
@@ -324,6 +348,12 @@
 
 <div id="chat"></div>
 
+<div id="date-bar">
+  <span>🗓️ Filter by date:</span>
+  <input type="date" id="date-filter" onchange="filterByDate()" title="Show links added on this date"/>
+  <button onclick="clearDateFilter()">✕ Clear</button>
+  <span id="date-label"></span>
+</div>
 <div id="suggestions">
   <div class="chip" onclick="sendChip(this)">🕹️ give me a game site</div>
   <div class="chip" onclick="sendChip(this)">🏆 best multiplayer games</div>
@@ -341,104 +371,120 @@
   // ============================================================
   // CONFIGURATION
   // ============================================================
-  const GROQ_API_KEY = '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';
+  const GROQ_API_KEY = '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';
 
-const GAME_SITES = [
-  {
-    name: "lunarv2",
-    links: [
-      "https://nirbytes-lunar.b-cdn.net/",
-      "https://lunarnirbytes.b-cdn.net/",
-      "https://sky.starnightimport.com/",
-      "https://racing.marckbikes.com/",
-      "https://linewize.rachelsfinds.com/",
-      "https://business.lasente.com/",
-      "https://healthy.khastat.org/",
-      "https://greatest.aletiatours.com/",
-      "https://lunnar.gressvikbmx.no/"
-    ]
-  },
-  {
-    name: "infamous",
-    links: [
-      "https://nirbytesinfamous-ollmk.funvenet.org.ve",
-      "https://follownirbytes-hmcwqhuh.maxmir-energy.ru",
-      "https://qbxsfacktn.name.shi-n.ing",
-      "https://nirbytesinfamous-mjurxad.neeb.wtf",
-      "https://readingstudies.v6.rocks",
-      "https://focusmath.v6.navy",
-      "https://liteweb571.b-cdn.net/"
-    ]
-  },
-  {
-    name: "studyhub",
-    links: [
-      "https://nirbytes-studyhub.b-cdn.net/",
-      "https://nirbytes-mathstd.b-cdn.net/",
-      "https://lightspeed.blog/",
-      "https://childeducation.site/",
-      "https://flowcharts.iteflow.com.np/",
-      "https://guardian.sicily.co.uk/",
-      "https://motor.marckbikes.com/",
-      "https://smartbio.lervs.ro/",
-      "https://mathnotes.online/"
-    ]
-  },
-  {
-    name: "strawberry",
-    links: [
-      "https://strawbynirbytes.b-cdn.net/",
-      "https://nirbytes-strw.b-cdn.net/",
-      "https://faqs.lightspeed.blog/",
-      "https://climate.weatherpixel.com/",
-      "https://living.everything-cold.co.uk/",
-      "https://learning.mathnotes.online/",
-      "https://k12learning.mathnotes.online/",
-      "https://dreams.sicily.co.uk/",
-      "https://flows.iteflow.com.np/"
-    ]
-  },
-  {
-    name: "luminalos",
-    links: [
-      "https://nirbytes-luminal.b-cdn.net/",
-      "https://nirbytesprolum.b-cdn.net/",
-      "https://scramupdate.cfd/"
-    ]
-  },
-  {
-    name: "void",
-    links: [
-      "https://learn-about-area51.flextron.xyz/",
-      "https://architecture-classes.everything-cold.co.uk/", 
-      "https://shakespeare-english.lervs.ro/",
-      "https://soccerclasses.gressvikbmx.no/",
-      "https://basketball-hoops.gressvikbmx.com/",
-      "https://d2expv7pffwzj4.cloudfront.net/"
-    ]
-  },
-  {
-    name: "galaxy",
-    links: [
-      "https://nirbytes-galaxy.b-cdn.net/onboarding/",
-      "https://poweredbynirbytesg.b-cdn.net/",
-      "https://youareagooner.ovie.gob.mx/"
-    ]
-  },
-  {
-    name: "rosin",
-    links: [
-      "https://nirbytesrosin-aoyc.brtk.eu",
-      "https://mtabaemsxf.maxmir-energy.ru",
-      "https://nirbytesrosin-itiq.maxmir-energy.ru",
-      "https://pbuojxobel.name.shi-n.ing",
-      "https://nirbytesnproxy-mfpk.neeb.wtf",
-      "https://goutblowing.eastcountywireless.com/",
-      "https://blowtheza.callcentercuritiba.com.br/"
-    ]
-  }
-];
-  
+  const GAME_SITES = [
+    {
+      name: "lunarv2",
+      links: [
+        "https://nirbytes-lunar.b-cdn.net/",
+        "https://lunarnirbytes.b-cdn.net/",
+        "https://sky.starnightimport.com/",
+        "https://racing.marckbikes.com/",
+        "https://linewize.rachelsfinds.com/",
+        "https://business.lasente.com/",
+        "https://healthy.khastat.org/",
+        "https://greatest.aletiatours.com/",
+        "https://lunnar.gressvikbmx.no/"
+      ]
+    },
+    {
+      name: "lunaar",
+      links: [
+        "https://kufexsqzce.dnswish.com",
+        "https://lkerenyhuw.name.shi-n.ing",
+        "https://nirbyteslunar-qxru.soyescalahumana.cl",
+        "https://nirbytesyt-qgfyou.surfek.xyz",
+        "https://nirbyteslunar-jax.terbos.com.br",
+        "https://astrology-081233783.b-cdn.net",
+        "https://math-18973923.b-cdn.net",
+        "https://accounts-78132213.b-cdn.net",
+        "https://mail-129837183.b-cdn.net",
+        "https://science-12397239.b-cdn.net"
+      ]
+    },
+    {
+      name: "studyhub",
+      links: [
+        "https://nirbytes-studyhub.b-cdn.net/",
+        "https://nirbytes-mathstd.b-cdn.net/",
+        "https://lightspeed.blog/",
+        "https://childeducation.site/",
+        "https://flowcharts.iteflow.com.np/",
+        "https://guardian.sicily.co.uk/",
+        "https://motor.marckbikes.com/",
+        "https://smartbio.lervs.ro/",
+        "https://mathnotes.online/"
+      ]
+    },
+    {
+      name: "strawberry",
+      links: [
+        "https://strawbynirbytes.b-cdn.net/",
+        "https://nirbytes-strw.b-cdn.net/",
+        "https://faqs.lightspeed.blog/",
+        "https://climate.weatherpixel.com/",
+        "https://living.everything-cold.co.uk/",
+        "https://learning.mathnotes.online/",
+        "https://k12learning.mathnotes.online/",
+        "https://dreams.sicily.co.uk/",
+        "https://flows.iteflow.com.np/"
+      ]
+    },
+    {
+      name: "luminalos",
+      links: [
+        "https://nirbytes-luminal.b-cdn.net/",
+        "https://nirbytesprolum.b-cdn.net/",
+        "https://scramupdate.cfd/"
+      ]
+    },
+    {
+      name: "void",
+      links: [
+        "https://learn-about-area51.flextron.xyz/",
+        "https://architecture-classes.everything-cold.co.uk/",
+        "https://shakespeare-english.lervs.ro/",
+        "https://soccerclasses.gressvikbmx.no/",
+        "https://basketball-hoops.gressvikbmx.com/",
+        "https://d2expv7pffwzj4.cloudfront.net/"
+      ]
+    },
+    {
+      name: "galaxy",
+      links: [
+        "https://nirbytes-galaxy.b-cdn.net/onboarding/",
+        "https://poweredbynirbytesg.b-cdn.net/",
+        "https://youareagooner.ovie.gob.mx/"
+      ]
+    },
+    {
+      name: "rosin",
+      links: [
+        "https://nirbytesrosin-aoyc.brtk.eu",
+        "https://mtabaemsxf.maxmir-energy.ru",
+        "https://nirbytesrosin-itiq.maxmir-energy.ru",
+        "https://pbuojxobel.name.shi-n.ing",
+        "https://nirbytesnproxy-mfpk.neeb.wtf",
+        "https://goutblowing.eastcountywireless.com/",
+        "https://blowtheza.callcentercuritiba.com.br/"
+      ]
+    },
+    {
+      name: "infamous",
+      links: [
+        "https://nirbytesinfamous-ollmk.funvenet.org.ve",
+        "https://follownirbytes-hmcwqhuh.maxmir-energy.ru",
+        "https://gbxsfacktn.name.shi-n.ing",
+        "https://ewtwopopcq.neeb.wtf",
+        "https://nirbytesinfamous-mjurxad.neeb.wtf",
+        "https://readingstudies.v6.rocks",
+        "https://focusmath.v6.navy",
+        "https://liteweb5761.b-cdn.net/",
+        "https://brightpipe3043.b-cdn.net/"
+      ]
+    }
+  ]; // <-- THE FIX: Added closing bracket and semicolon here
 
   const DISCORD_WEBHOOK = 'https://discord.com/api/webhooks/1500960533342454003/uHcwRNYZCRJlLF3xQ3Syse0lBJyiUi_Uu-KV9J40oJwT3CIZmcdAXnt8tTsihkaEEk0M';
 
@@ -515,8 +561,10 @@ type: idea / feedback / more links`;
 
   // ── CORE CHAT LOGIC (GROQ INTEGRATED) ──────────────────
   async function sendMessage(text) {
+    if (sendMessage._sending) return;
+    sendMessage._sending = true;
     const msg = (text || inputEl.value).trim();
-    if (!msg) return;
+    if (!msg) { sendMessage._sending = false; return; }
     
     inputEl.value = '';
     inputEl.style.height = 'auto';
@@ -527,6 +575,8 @@ type: idea / feedback / more links`;
 
     if (msg.toLowerCase().startsWith('suggest:')) {
       sendToDiscord(msg.slice(8).trim());
+      sendMessage._sending = false; // Reset sending state
+      return;
     }
 
     try {
@@ -567,6 +617,7 @@ type: idea / feedback / more links`;
     }
 
     sendBtn.disabled = false;
+    sendMessage._sending = false;
     inputEl.focus();
   }
 
@@ -585,6 +636,7 @@ type: idea / feedback / more links`;
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ content: discordMsg })
       });
+      removeTyping();
       addBotMessage("✅ Sent to the owner! Thanks for the feedback! 🙌");
     } catch(e) {
       console.error("Discord error", e);
@@ -598,6 +650,28 @@ type: idea / feedback / more links`;
     inputEl.focus();
     const pos = inputEl.value.indexOf('message: ') + 9;
     inputEl.setSelectionRange(pos, pos);
+  }
+
+  function filterByDate() {
+    const date = document.getElementById('date-filter').value;
+    if (!date) return;
+    const label = document.getElementById('date-label');
+    const matches = GAME_SITES.filter(s => s.date === date);
+    if (matches.length === 0) {
+      label.textContent = 'No links found for this date';
+      addBotMessage(`😔 No links were added on **${date}**. Try a different date!`);
+      return;
+    }
+    label.textContent = `${matches.length} site(s) found`;
+    const list = matches.map(s =>
+      `**${s.name}** (${s.links.length} links):\n${s.links.map(l => `[${l}](${l})`).join('\n')}`
+    ).join('\n\n');
+    addBotMessage(`🗓️ Links added on **${date}**:\n\n${list}`);
+  }
+
+  function clearDateFilter() {
+    document.getElementById('date-filter').value = '';
+    document.getElementById('date-label').textContent = '';
   }
 
   function sendChip(chip) { sendMessage(chip.textContent.trim()); }
@@ -680,6 +754,3 @@ type: idea / feedback / more links`;
   const existingSession = localStorage.getItem('gamebot_session');
   if (existingSession) { startSession(existingSession); }
 </script>
-</div>
-</body>
-</html>
